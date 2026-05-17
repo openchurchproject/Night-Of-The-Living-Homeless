@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
+    <title>Sacred Grounds · Holy Defense · Night of the Living Homeless</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #0a0f0a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Poppins', system-ui, monospace;
+            padding: 16px;
+            touch-action: pan-x pan-y; 
+        }
+
+        .game-container {
+            width: 1200px;
+            max-width: 100%;
+            height: 840px;
+            max-height: 90vh;
+            background: #1f3b1a;
+            border-radius: 32px;
+            border: 6px solid #b87c4f;
+            box-shadow: 0 30px 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        @media (max-width: 1250px) {
+            .game-container {
+                width: 95vw;
+                height: calc(95vw * 0.7);
+                max-height: 90vh;
+            }
+        }
+
+        .header {
+            background: linear-gradient(145deg, #4f3222, #2e1e12);
+            color: #ffefcf;
+            padding: 10px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #e7b45a;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+            gap: 12px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-area img {
+            height: 48px;
+            filter: drop-shadow(0 2px 4px black);
+        }
+
+        .score-area {
+            display: flex;
+            gap: 16px;
+            font-weight: bold;
+            background: #281d12aa;
+            backdrop-filter: blur(4px);
+            padding: 4px 14px;
+            border-radius: 60px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .score-box, .high-score {
+            background: #1f2618;
+            padding: 4px 16px;
+            border-radius: 40px;
+            border: 1px solid #e7bc71;
+            font-family: monospace;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .stage-selector {
+            background: #e7bc71;
+            color: #2a1c0e;
+            padding: 4px 12px;
+            border-radius: 60px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9rem;
+            box-shadow: 0 3px 0 #7a521f;
+            transition: 0.05s linear;
+        }
+
+        .stage-selector:active {
+            transform: translateY(2px);
+        }
+
+        .music-toggle {
+            background: #2e2a24;
+            border: none;
+            font-size: 1.5rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #5a3e2a;
+            transition: 0.05s linear;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+        .music-toggle:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #5a3e2a;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .ctrl-btn {
+            background: #b3874b;
+            border: none;
+            font-size: 1.5rem;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #5e3f1e;
+            transition: 0.05s linear;
+            font-weight: bold;
+            color: #2e241a;
+            touch-action: manipulation;
+        }
+
+        .ctrl-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #5e3f1e;
+        }
+
+        .fire-btn {
+            background: #c94f4f;
+            color: #fff5e0;
+            box-shadow: 0 5px 0 #812a2a;
+        }
+
+        .game-area {
+            position: relative;
+            flex: 1;
+            background: #2c4924;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            cursor: crosshair;
+            scrollbar-width: thin;
+        }
+
+        .game-area::-webkit-scrollbar {
+            width: 6px;
+            background: #2b4422;
+        }
+        .game-area::-webkit-scrollbar-thumb {
+            background: #b87c4f;
+            border-radius: 10px;
+        }
+
+        .game-scroll-content {
+            position: relative;
+            min-height: 100%;
+            width: 100%;
+        }
+
+        .game-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://github.com/openchurchproject/Night-Of-The-Living-Homeless/raw/main/Map-1.png');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            opacity: 0.9;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .lane-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .lane-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: repeating-linear-gradient(90deg, rgba(220, 200, 100, 0.7), rgba(220, 200, 100, 0.7) 12px, rgba(80, 60, 30, 0.5) 12px, rgba(80, 60, 30, 0.5) 24px);
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .lane-glow {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 18%;
+            background: radial-gradient(ellipse at left, rgba(255, 215, 120, 0.35), transparent);
+            pointer-events: none;
+            z-index: 2;
+            transition: top 0.08s ease;
+            border-left: 3px solid #ffd966;
+            opacity: 0.9;
+        }
+
+        .church {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 88%;
+            z-index: 6;
+            pointer-events: none;
+            filter: drop-shadow(8px 0 12px rgba(0,0,0,0.5));
+        }
+
+        .church img {
+            height: 100%;
+            width: auto;
+            display: block;
+        }
+
+        .defender {
+            position: absolute;
+            width: 110px;
+            left: 42px;
+            transform: translateY(-50%);
+            z-index: 22;
+            transition: top 0.08s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            pointer-events: none;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+        }
+
+        .defender img {
+            width: 100%;
+            display: block;
+            animation: gentleFloat 1.6s infinite ease-in-out;
+        }
+
+        @keyframes gentleFloat {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-3px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .zombie {
+            position: absolute;
+            width: 85px;
+            transform: translateY(-50%);
+            z-index: 15;
+            filter: drop-shadow(0 6px 5px rgba(0,0,0,0.6));
+            transition: left 0.02s linear;
+        }
+
+        .zombie img {
+            width: 100%;
+            display: block;
+        }
+
+        .projectile {
+            position: absolute;
+            width: 52px;
+            transform: translateY(-50%);
+            z-index: 28;
+            filter: drop-shadow(0 0 5px gold);
+        }
+
+        .projectile img {
+            width: 100%;
+            display: block;
+            animation: bibleSpin 0.25s infinite linear;
+        }
+
+        @keyframes bibleSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .overlay, .start-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            color: #ffefcf;
+            font-size: 2rem;
+            font-weight: bold;
+            gap: 24px;
+            text-align: center;
+        }
+
+        .overlay.hidden, .start-screen.hidden {
+            display: none;
+        }
+
+        .start-logo {
+            max-width: 40%;
+            filter: drop-shadow(0 0 20px #f9b81b);
+            animation: beatPulse 1.2s infinite;
+        }
+
+        @keyframes beatPulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 25px orange); }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+
+        .start-button {
+            background: #dbb15d;
+            border: none;
+            font-size: 1.5rem;
+            padding: 14px 34px;
+            border-radius: 80px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #7c5e3a;
+            transition: 0.05s linear;
+            color: #241a0c;
+        }
+
+        .start-button:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #7c5e3a;
+        }
+
+        .donation-card {
+            position: absolute;
+            top: 18%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a2819e6;
+            backdrop-filter: blur(16px);
+            border-radius: 56px;
+            padding: 18px 24px;
+            z-index: 280;
+            border: 2px solid #ffcf4a;
+            text-align: center;
+            width: 340px;
+            max-width: 85vw;
+            color: #ffffdd;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+        }
+
+        .donation-card.hidden {
+            display: none;
+        }
+
+        .donate-btn, .close-donate {
+            background: #f5b642;
+            border: none;
+            padding: 8px 18px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 4px;
+        }
+
+        .close-donate {
+            background: #6d4c2c;
+            color: #ffecb3;
+        }
+
+        .mobile-controls {
+            display: none;
+            background: #2b1a0e;
+            padding: 12px;
+            justify-content: space-around;
+            border-top: 3px solid #b87c4f;
+        }
+
+        @media (max-width: 800px) {
+            .controls {
+                display: none;
+            }
+            .mobile-controls {
+                display: flex;
+            }
+            .ctrl-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.8rem;
+            }
+            .fire-btn {
+                width: 70px;
+            }
+        }
+
+        .danger-zone {
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: radial-gradient(ellipse at center, #ff3333, #7a1f1f);
+            box-shadow: 0 0 8px red;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div class="header">
+        <div class="logo-area">
+            <img src="https://github.com/openchurchproject/Night-Of-The-Living-Homeless/raw/main/Logo-Favicon.png" alt="Sacred Symbol">
+            <span style="font-size: 0.9rem;">✝️ HOLY DEFENSE</span>
+        </div>
+        <div class="score-area">
+            <div class="score-box">📖 <span id="scoreValue">0</span></div>
+            <select id="stageSelect" class="stage-selector">
+                <option value="1">Stage 1</option><option value="2">Stage 2</option><option value="3">Stage 3</option>
+                <option value="4">Stage 4</option><option value="5">Stage 5</option><option value="6">Stage 6</option>
+                <option value="7">Stage 7</option><option value="8">Stage 8</option><option value="9">Stage 9</option>
+                <option value="10">Stage 10</option>
+            </select>
+            <div class="high-score">🏆 <span id="highScoreVal">0</span></div>
+            <button id="musicToggleBtn" class="music-toggle">🔊</button>
+        </div>
+        <div class="controls">
+            <button class="ctrl-btn" id="upBtn">⬆️</button>
+            <button class="ctrl-btn fire-btn" id="shootBtn">📖</button>
+            <button class="ctrl-btn" id="downBtn">⬇️</button>
+        </div>
+    </div>
+
+    <div class="game-area" id="gameArea">
+        <div class="game-scroll-content" id="gameScrollContent">
+            <div class="game-bg"></div>
+            <div class="lane-overlay" id="laneOverlay"></div>
+            <div id="laneGlow" class="lane-glow"></div>
+            <div class="danger-zone"></div>
+            <div class="church">
+                <img src="https://github.com/openchurchproject/Night-Of-The-Living-Homeless/raw/main/Church-1.png" alt="Sanctuary">
+            </div>
+            <div class="defender" id="defender">
+                <img src="https://github.com/openchurchproject/Night-Of-The-Living-Homeless/raw/main/Pastor.gif" alt="Pastor">
+            </div>
+        </div>
+
+        <div id="startScreen" class="start-screen">
+            <img class="start-logo" src="https://github.com/openchurchproject/Night-Of-The-Living-Homeless/raw/main/Logo-Favicon.png" alt="Logo">
+            <button class="start-button" id="startGameBtn">⚔️ DEFEND THE CHURCH ⚔️</button>
+        </div>
+
+        <div id="donationBox" class="donation-card hidden">
+            <p>📢 HELP THE HOMELESS ON OUR LAND</p>
+            <button id="donateNowBtn" class="donate-btn">✝️ SUPPORT MISSION ✝️</button>
+            <button id="closeDonateBtn" class="close-donate">Close</button>
+        </div>
+
+        <div id="messageOverlay" class="overlay hidden">
+            <span id="messageText"></span>
+            <div id="nextHint" style="font-size:1.2rem; background:#2d2013; padding:8px 24px; border-radius:40px;"></div>
+        </div>
+    </div>
+
+    <div class="mobile-controls">
+        <button class="ctrl-btn" id="upBtnM">⬆️</button>
+        <button class="ctrl-btn fire-btn" id="shootBtnM">📖</button>
+        <button class="ctrl-btn" id="downBtnM">⬇️</button>
+    </div>
+</div>
+
+<script>
+    (function(){
+        // ========== GAME CONSTANTS ==========
+        const LANES = 7;
+        const ZOMBIE_WIDTH_PX = 85;
+        const ZOMBIE_SPEED = 1.55;      
+        const PROJ_SPEED = 7.5;
+        const ZOMBIE_DEATH_X = 38;      
+        const ZOMBIE_MAX_HP = 5;
+        const STAGE_COUNTS = [10,12,14,16,18,20,22,24,26,30];
+        const SPAWN_DELAY_MS = 1450;
+        const ZOMBIE_IMG = 'https://github.com/openchurchproject/Night-Of-The-Living-Homeless/raw/main/Home-Gif-1.gif';
+
+        // ========== ROBUST MUSIC SYSTEM - PLAYS ALL 3 SONGS IN LOOP ==========
+        const MUSIC_TRACKS = [
+            'https://github.com/openchurchproject/Night-Of-The-Living-Homeless/raw/main/song-1.mp3',
+            'https://github.com/openchurchproject/Night-Of-The-Living-Homeless/raw/main/song-2.mp3',
+            'https://github.com/openchurchproject/Night-Of-The-Living-Homeless/raw/main/song-3.mp3'
+        ];
+        
+        let musicActive = false;      // true after user starts game
+        let musicMuted = false;
+        let currentTrackIndex = 0;
+        let audioElement = null;
+        let trackCheckInterval = null; // fallback timer
+        
+        // Advance to the next track (cyclic)
+        function advanceToNextTrack() {
+            if (!musicActive || musicMuted) return;
+            currentTrackIndex = (currentTrackIndex + 1) % MUSIC_TRACKS.length;
+            const nextSrc = MUSIC_TRACKS[currentTrackIndex];
+            if (audioElement) {
+                audioElement.pause();
+                audioElement.src = '';
+            }
+            audioElement = new Audio(nextSrc);
+            audioElement.volume = 0.55;
+            audioElement.play().catch(e => console.log("play error", e));
+            // Set up ended event
+            audioElement.onended = () => {
+                advanceToNextTrack();
+            };
+            // Restart the interval fallback
+            if (trackCheckInterval) clearInterval(trackCheckInterval);
+            trackCheckInterval = setInterval(() => {
+                if (!musicActive || musicMuted) return;
+                if (audioElement && audioElement.ended) {
+                    advanceToNextTrack();
+                }
+            }, 500);
+        }
+        
+        // Start music from song 1
+        function startMusic() {
+            if (musicActive) return;
+            musicActive = true;
+            currentTrackIndex = 0;
+            const src = MUSIC_TRACKS[0];
+            if (audioElement) {
+                audioElement.pause();
+                audioElement.src = '';
+            }
+            audioElement = new Audio(src);
+            audioElement.volume = 0.55;
+            audioElement.onended = () => {
+                advanceToNextTrack();
+            };
+            if (!musicMuted) {
+                audioElement.play().catch(e => console.log("play blocked", e));
+            }
+            if (trackCheckInterval) clearInterval(trackCheckInterval);
+            trackCheckInterval = setInterval(() => {
+                if (!musicActive || musicMuted) return;
+                if (audioElement && audioElement.ended) {
+                    advanceToNextTrack();
+                }
+            }, 500);
+        }
+        
+        function toggleMute() {
+            musicMuted = !musicMuted;
+            const btn = document.getElementById('musicToggleBtn');
+            if (btn) btn.innerText = musicMuted ? '🔇' : '🔊';
+            if (!musicActive) return;
+            if (musicMuted) {
+                if (audioElement) audioElement.pause();
+            } else {
+                if (audioElement && audioElement.paused) {
+                    audioElement.play().catch(e=>console.log);
+                } else if (!audioElement) {
+                    startMusic();
+                }
+            }
+        }
+        
+        // Ensure music continues playing after game events (never resets song)
+        function ensureMusicPlaying() {
+            if (!musicActive) return;
+            if (musicMuted) return;
+            if (!audioElement || audioElement.paused) {
+                if (audioElement) {
+                    audioElement.play().catch(e=>console.log);
+                } else {
+                    startMusic();
+                }
+            }
+        }
+        
+        // DOM elements
+        const gameArea = document.getElementById('gameArea');
+        const scrollContent = document.getElementById('gameScrollContent');
+        const defenderDiv = document.getElementById('defender');
+        const scoreSpan = document.getElementById('scoreValue');
+        const highScoreSpan = document.getElementById('highScoreVal');
+        const stageSelect = document.getElementById('stageSelect');
+        const startScreenDiv = document.getElementById('startScreen');
+        const messageOverlay = document.getElementById('messageOverlay');
+        const messageTextSpan = document.getElementById('messageText');
+        const nextHintDiv = document.getElementById('nextHint');
+        const donationBox = document.getElementById('donationBox');
+        const startBtn = document.getElementById('startGameBtn');
+        const laneOverlay = document.getElementById('laneOverlay');
+        const laneGlow = document.getElementById('laneGlow');
+        const musicToggleBtn = document.getElementById('musicToggleBtn');
+        if (musicToggleBtn) musicToggleBtn.onclick = toggleMute;
+        
+        // Buttons
+        const upBtn = document.getElementById('upBtn');
+        const downBtn = document.getElementById('downBtn');
+        const shootBtn = document.getElementById('shootBtn');
+        const upBtnM = document.getElementById('upBtnM');
+        const downBtnM = document.getElementById('downBtnM');
+        const shootBtnM = document.getElementById('shootBtnM');
+        const donateNow = document.getElementById('donateNowBtn');
+        const closeDonate = document.getElementById('closeDonateBtn');
+        
+        // Game state
+        let defenderLane = 3;
+        let currentStage = 1;
+        let score = 0;
+        let highScore = parseInt(localStorage.getItem('nolfHighScore') || '0');
+        let running = false;
+        let stageToken = 0;
+        let zombies = [];
+        let bullets = [];
+        let zombiesToSpawn = 0;
+        let zombiesAlive = 0;
+        let nextZombieId = 0;
+        let nextBulletId = 0;
+        let announcementShown = false;
+        let pendingSpawnRetry = false;
+        
+        highScoreSpan.innerText = highScore;
+        
+        function getLaneY(lane) {
+            if (!scrollContent) return 100;
+            const h = scrollContent.clientHeight;
+            if (h <= 0) return 100 + (lane * 35);
+            const laneHeight = h / LANES;
+            return laneHeight * (lane + 0.5);
+        }
+        
+        function updateDefenderPos() {
+            if (!scrollContent) return;
+            const y = getLaneY(defenderLane);
+            if (!isNaN(y) && isFinite(y)) defenderDiv.style.top = y + 'px';
+            updateLaneGlow();
+            scrollToDefender();
+        }
+        
+        function updateLaneGlow() {
+            if (!scrollContent) return;
+            const h = scrollContent.clientHeight;
+            if (h <= 0) return;
+            const laneHeight = h / LANES;
+            laneGlow.style.top = (defenderLane * laneHeight) + 'px';
+            laneGlow.style.height = laneHeight + 'px';
+        }
+        
+        function scrollToDefender() {
+            if (!gameArea || !defenderDiv) return;
+            const defenderRect = defenderDiv.getBoundingClientRect();
+            const areaRect = gameArea.getBoundingClientRect();
+            if (areaRect.height === 0) return;
+            const relativeTop = defenderRect.top - areaRect.top;
+            const targetScroll = gameArea.scrollTop + relativeTop - (areaRect.height / 2) + (defenderRect.height / 2);
+            if (!isNaN(targetScroll) && targetScroll >= 0) {
+                gameArea.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
+            }
+        }
+        
+        function buildLaneMarkers() {
+            if (!laneOverlay || !scrollContent) return;
+            laneOverlay.innerHTML = '';
+            const areaH = scrollContent.clientHeight;
+            if (areaH <= 0) return;
+            for (let i = 0; i < LANES; i++) {
+                const laneY = (areaH / LANES) * (i + 0.5);
+                const line = document.createElement('div');
+                line.className = 'lane-line';
+                line.style.top = laneY + 'px';
+                laneOverlay.appendChild(line);
+            }
+        }
+        
+        function refreshAllPositions() {
+            for(let z of zombies) {
+                if(z.element) z.element.style.top = getLaneY(z.lane) + 'px';
+            }
+            for(let b of bullets) {
+                if(b.element) b.element.style.top = getLaneY(b.lane) + 'px';
+            }
+            updateDefenderPos();
+            buildLaneMarkers();
+        }
+        
+        function spawnZombie() {
+            if (!scrollContent || !running) return false;
+            const containerWidth = scrollContent.clientWidth;
+            if (containerWidth < 120) {
+                if (!pendingSpawnRetry && zombiesToSpawn > 0) {
+                    pendingSpawnRetry = true;
+                    setTimeout(() => {
+                        pendingSpawnRetry = false;
+                        if (running && zombiesToSpawn > 0) spawnZombie();
+                    }, 60);
+                }
+                return false;
+            }
+            const lane = Math.floor(Math.random() * LANES);
+            const id = nextZombieId++;
+            const div = document.createElement('div');
+            div.className = 'zombie';
+            let spawnX = containerWidth - ZOMBIE_WIDTH_PX - 8;
+            spawnX = Math.max(spawnX, ZOMBIE_DEATH_X + 70);
+            div.style.left = spawnX + 'px';
+            div.style.top = getLaneY(lane) + 'px';
+            const img = document.createElement('img');
+            img.src = ZOMBIE_IMG;
+            img.alt = 'Lost Soul';
+            img.draggable = false;
+            div.appendChild(img);
+            scrollContent.appendChild(div);
+            zombies.push({
+                id, lane, x: spawnX,
+                hp: ZOMBIE_MAX_HP, element: div
+            });
+            zombiesToSpawn--;
+            zombiesAlive++;
+            return true;
+        }
+        
+        function scheduleSpawner(token) {
+            if (!running) return;
+            function tick() {
+                if (token !== stageToken || !running) return;
+                if (zombiesToSpawn > 0) {
+                    const success = spawnZombie();
+                    if (success) {
+                        setTimeout(tick, SPAWN_DELAY_MS);
+                    } else {
+                        setTimeout(tick, 80);
+                    }
+                } else {
+                    checkStageComplete();
+                }
+            }
+            setTimeout(tick, SPAWN_DELAY_MS);
+        }
+        
+        function checkStageComplete() {
+            if (running && zombiesAlive === 0 && zombiesToSpawn === 0) {
+                stageComplete();
+            }
+        }
+        
+        function stageComplete() {
+            if (!running) return;
+            running = false;
+            stageToken++;
+            messageTextSpan.innerText = '🌟 STAGE CLEAR! HALLELUJAH 🌟';
+            messageOverlay.classList.remove('hidden');
+            if (currentStage < 10) {
+                const next = currentStage + 1;
+                const tok = stageToken;
+                nextHintDiv.innerText = `➡️ Stage ${next} loading... Strengthen your faith!`;
+                setTimeout(() => {
+                    if (tok !== stageToken) return;
+                    loadStage(next);
+                    stageSelect.value = next;
+                }, 2100);
+            } else {
+                nextHintDiv.innerText = '✨ VICTORY! YOU SAVED THE CHURCH ✨';
+                messageOverlay.classList.remove('hidden');
+            }
+        }
+        
+        function gameOver() {
+            if (!running) return;
+            running = false;
+            stageToken++;
+            for(let z of zombies) if(z.element) z.element.remove();
+            for(let b of bullets) if(b.element) b.element.remove();
+            zombies = [];
+            bullets = [];
+            messageTextSpan.innerText = '💀 THE HORDE REACHED THE CHURCH 💀';
+            nextHintDiv.innerText = 'Restarting mission...';
+            messageOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                restartGame();
+            }, 2300);
+        }
+        
+        function restartGame() {
+            for(let z of zombies) if(z.element) z.element.remove();
+            for(let b of bullets) if(b.element) b.element.remove();
+            zombies = [];
+            bullets = [];
+            score = 0;
+            scoreSpan.innerText = '0';
+            running = false;
+            announcementShown = false;
+            donationBox.classList.add('hidden');
+            // Music keeps playing same song (no reset)
+            ensureMusicPlaying();
+            loadStage(1);
+            stageSelect.value = '1';
+        }
+        
+        function loadStage(stage) {
+            const tok = ++stageToken;
+            for(let z of zombies) if(z.element) z.element.remove();
+            for(let b of bullets) if(b.element) b.element.remove();
+            zombies = [];
+            bullets = [];
+            currentStage = stage;
+            zombiesToSpawn = STAGE_COUNTS[stage-1] || 12;
+            zombiesAlive = 0;
+            running = true;
+            messageOverlay.classList.add('hidden');
+            scoreSpan.innerText = score;
+            defenderLane = Math.min(LANES-1, Math.max(0, defenderLane));
+            
+            requestAnimationFrame(() => {
+                if (tok === stageToken && scrollContent) {
+                    refreshAllPositions();
+                    buildLaneMarkers();
+                    scrollToDefender();
+                }
+            });
+            updateDefenderPos();
+            
+            if (stage === 1 && !announcementShown) {
+                donationBox.classList.remove('hidden');
+                announcementShown = true;
+            } else {
+                donationBox.classList.add('hidden');
+            }
+            scheduleSpawner(tok);
+            ensureMusicPlaying();
+        }
+        
+        let lastShotFrame = 0;
+        function shoot() {
+            if (!running || !scrollContent) return;
+            const now = Date.now();
+            if (lastShotFrame && now - lastShotFrame < 180) return;
+            lastShotFrame = now;
+            const id = nextBulletId++;
+            const div = document.createElement('div');
+            div.className = 'projectile';
+            const startX = 98;
+            div.style.left = startX + 'px';
+            div.style.top = getLaneY(defenderLane) + 'px';
+            const img = document.createElement('img');
+            img.src = 'https://github.com/openchurchproject/Night-Of-The-Living-Homeless/raw/main/Bible.png';
+            img.alt = 'Holy Bible';
+            div.appendChild(img);
+            scrollContent.appendChild(div);
+            bullets.push({ id, lane: defenderLane, x: startX, element: div });
+        }
+        
+        function moveUp() { if(running) { defenderLane = Math.max(0, defenderLane-1); updateDefenderPos(); } }
+        function moveDown() { if(running) { defenderLane = Math.min(LANES-1, defenderLane+1); updateDefenderPos(); } }
+        
+        function updateGame() {
+            if (!running) {
+                requestAnimationFrame(updateGame);
+                return;
+            }
+            if (!scrollContent) {
+                requestAnimationFrame(updateGame);
+                return;
+            }
+            const areaWidth = scrollContent.clientWidth;
+            for (let i=0; i<zombies.length; i++) {
+                const z = zombies[i];
+                z.x -= ZOMBIE_SPEED;
+                if (z.x < ZOMBIE_DEATH_X) {
+                    gameOver();
+                    requestAnimationFrame(updateGame);
+                    return;
+                }
+                z.element.style.left = z.x + 'px';
+                z.element.style.top = getLaneY(z.lane) + 'px';
+            }
+            for (let i=0; i<bullets.length; i++) {
+                const b = bullets[i];
+                b.x += PROJ_SPEED;
+                if (b.x > areaWidth + 200) {
+                    b.element.remove();
+                    bullets.splice(i,1);
+                    i--;
+                    continue;
+                }
+                b.element.style.left = b.x + 'px';
+            }
+            for (let i=0; i<bullets.length; i++) {
+                const bullet = bullets[i];
+                let hitIdx = -1;
+                for (let j=0; j<zombies.length; j++) {
+                    const z = zombies[j];
+                    if (z.lane !== bullet.lane) continue;
+                    const distance = Math.abs(z.x - bullet.x);
+                    if (distance < 42) {
+                        z.hp--;
+                        if (z.hp <= 0) {
+                            z.element.remove();
+                            zombies.splice(j,1);
+                            zombiesAlive--;
+                            score += 10;
+                            scoreSpan.innerText = score;
+                            checkStageComplete();
+                            if (!running) { requestAnimationFrame(updateGame); return; }
+                        }
+                        hitIdx = i;
+                        break;
+                    }
+                }
+                if (hitIdx !== -1) {
+                    bullets[hitIdx].element.remove();
+                    bullets.splice(hitIdx,1);
+                    i--;
+                }
+            }
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('nolfHighScore', highScore);
+                highScoreSpan.innerText = highScore;
+            }
+            requestAnimationFrame(updateGame);
+        }
+        
+        // Event listeners
+        startBtn.onclick = () => {
+            startScreenDiv.classList.add('hidden');
+            score = 0;
+            scoreSpan.innerText = '0';
+            announcementShown = false;
+            donationBox.classList.add('hidden');
+            startMusic();  // starts song 1 and will cycle to 2, 3, 1...
+            loadStage(1);
+            stageSelect.value = '1';
+        };
+        upBtn.onclick = moveUp;
+        downBtn.onclick = moveDown;
+        shootBtn.onclick = shoot;
+        upBtnM.onclick = moveUp;
+        downBtnM.onclick = moveDown;
+        shootBtnM.onclick = shoot;
+        
+        stageSelect.onchange = (e) => {
+            if (!running && !startScreenDiv.classList.contains('hidden')) return;
+            donationBox.classList.add('hidden');
+            announcementShown = true;
+            loadStage(parseInt(e.target.value));
+        };
+        donateNow.onclick = () => window.open('https://www.theopenchurchproject.org', '_blank');
+        closeDonate.onclick = () => donationBox.classList.add('hidden');
+        
+        const resizeObserver = new ResizeObserver(() => {
+            if(!scrollContent) return;
+            refreshAllPositions();
+            scrollToDefender();
+        });
+        if(scrollContent) resizeObserver.observe(scrollContent);
+        window.addEventListener('resize', () => {
+            refreshAllPositions();
+            scrollToDefender();
+        });
+        
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') { e.preventDefault(); moveUp(); }
+            if (e.key === 'ArrowDown') { e.preventDefault(); moveDown(); }
+            if (e.key === ' ' || e.key === 'Space') { e.preventDefault(); shoot(); }
+        });
+        
+        refreshAllPositions();
+        requestAnimationFrame(updateGame);
+    })();
+</script>
+</body>
+</html>
